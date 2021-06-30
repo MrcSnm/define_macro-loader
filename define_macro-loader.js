@@ -144,10 +144,19 @@ function replaceUsages(source)
                 continue;
 
             var argValues = m[1].split(",");
+            
+            let shouldCloseFunction = false;
+            if(argValues[argValues.length-1].indexOf(")") != -1 &&
+            indexOfStringClosing(argValues[argValues.length-1], "(", ")") == -1) 
+            {
+                argValues[argValues.length-1] = argValues[argValues.length-1].replace(")", "");
+                shouldCloseFunction = true;
+            }
 
             var argNames = getDefineArguments(defines[b]);
             for(var i = 0; i < argNames.length; i++)
                 argNames[i] = replaceAll(argNames[i], " ", "");
+
 
 
             //Cache the target function
@@ -185,13 +194,15 @@ function replaceUsages(source)
             {
                 //Get return statement to replace
                 const returnIndex = getFirstReturnIndex(replacedFunc);
-                const retStatement = replacedFunc.substring(returnIndex+"return ".length, replacedFunc.lastIndexOf("})"));
+                const retStatement = replacedFunc.substring(returnIndex+"return ".length, replacedFunc.lastIndexOf("})")).replace(";", "");
                 const process = replacedFunc.substring(replacedFunc.indexOf("{")+1, returnIndex);
                 //Get rid of the return, as "=" symbol will do the task.
                 let index = m.index-1;
                 while(isCharSpace(source[--index]));
-                if(source[index] == "=" || source[index] == "(") //Found the user
-                {
+                
+                //There is no need to find some kind of user, as a setter could return a value or not
+                // if(source[index] == "=" || source[index] == "(") 
+                // {
                     const firstLineBreak = source.lastIndexOf("\n", index); //Find first back \n
 
                     //First endline
@@ -201,8 +212,8 @@ function replaceUsages(source)
                     let line = source.substring(firstLineBreak, endLine);
                     if(source[endLine] === ";")
                         line+=";";
-                    nSource = nSource.replace(line, process + source.substring(firstLineBreak, m.index) + retStatement);
-                }
+                    nSource = nSource.replace(line, process + source.substring(firstLineBreak, m.index) + retStatement + (shouldCloseFunction ? ")" : ""));
+                // }
             }
             else
             {
@@ -213,6 +224,10 @@ function replaceUsages(source)
                     throw new SyntaxError("Tried to assign a variable with a void function '"+b+"'");
                
                 replacedFunc = replacedFunc.substring(0, replacedFunc.lastIndexOf(")"));
+
+                //If it does not use variables, do not create scope
+                if(funcVars.length == 0) 
+                    replacedFunc = replacedFunc.substring(1, replacedFunc.length-1);
                 nSource = nSource.replace(new RegExp(b+"\\(.*\\);?"), replacedFunc);
             }
         }
