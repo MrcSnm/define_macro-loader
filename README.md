@@ -5,7 +5,7 @@ This is a webpack loader, which uses saves macro definitions. Definitions are al
 
 To add to your config, simply:
 
-{ test: /\.tsx?$/, use: [{ loader: path.resolve('../define_macro-loader.js')}]}
+`{ test: /\.tsx?$/, use: [{ loader: path.resolve('../define_macro-loader.js')}]}`
 
 For applying it in your code, just call the following:
 
