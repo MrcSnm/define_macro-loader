@@ -1,5 +1,5 @@
 {
-  "name": "define_macro-loader",
+  "name": "@hipreme_entertainment/define_macro-loader",
   "version": "1.0.2",
   "description": "Provides a C-like macro for javascript and typescript",
   "main": "define_macro-loader.js",
