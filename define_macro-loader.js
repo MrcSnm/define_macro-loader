@@ -176,6 +176,8 @@ function replaceUsages(source)
                 (match) => "__"+match+"__");
             }
 
+            if(typeof argNames == "string")
+                argNames = [argNames];
             //Change the arguments to the absolute value passed
             for(var i = 0; i < argNames.length; i++)
             {

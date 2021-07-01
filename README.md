@@ -53,7 +53,8 @@ DEFINE(Increment, (v) =>
 let i = 0;
 
 Increment(i);
-console.log(i); //1
+console.log(Increment(i)); //1
+console.log(i); //2
 
 ```
 
