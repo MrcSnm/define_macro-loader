@@ -57,6 +57,35 @@ function indexOfStringClosing(input, openString, closeString, start)
     return -1;
 }
 
+function getMacroReturnIndex(input)
+{
+    let curlyBracketLevel = 0;
+
+    for(let i = 0; i < input.length; i++)
+    {
+        if(input[i] === "{")
+            curlyBracketLevel++;
+        else if(input[i] === "}")
+            curlyBracketLevel--;
+       
+        if(input[i] === 'r')
+        {
+            let hasBroke = false;
+            for(let z = 0; z < "return ".length; z++)
+            {
+                if(input[i+z] !== "return "[z])
+                {
+                    hasBroke = true;
+                    break;
+                }
+            }
+            if(!hasBroke && curlyBracketLevel == 1)
+                return i;
+        }
+    }
+    return -1;
+}
+
 
 const defines = {};
 function checkNotDefined(name)
@@ -144,10 +173,11 @@ function replaceUsages(source)
                 continue;
 
             var argValues = m[1].split(",");
-            
+
+           
             let shouldCloseFunction = false;
             if(argValues[argValues.length-1].indexOf(")") != -1 &&
-            indexOfStringClosing(argValues[argValues.length-1], "(", ")") == -1) 
+            indexOfStringClosing(argValues[argValues.length-1], "(", ")") == -1)
             {
                 argValues[argValues.length-1] = argValues[argValues.length-1].replace(")", "");
                 shouldCloseFunction = true;
@@ -156,8 +186,6 @@ function replaceUsages(source)
             var argNames = getDefineArguments(defines[b]);
             for(var i = 0; i < argNames.length; i++)
                 argNames[i] = replaceAll(argNames[i], " ", "");
-
-
 
             //Cache the target function
             var replacedFunc = defines[b];
@@ -187,11 +215,10 @@ function replaceUsages(source)
 
             //Destroy everything until finding the first {
             replacedFunc = replacedFunc.substring(replacedFunc.indexOf("{"))
-
            
 
             //Search a return for wether the function should be treated as a rval or code block
-            const retIndex = replacedFunc.lastIndexOf("return ");
+            const retIndex = getMacroReturnIndex(replacedFunc);
             if(retIndex != -1)
             {
                 //Get return statement to replace
@@ -201,9 +228,9 @@ function replaceUsages(source)
                 //Get rid of the return, as "=" symbol will do the task.
                 let index = m.index-1;
                 while(isCharSpace(source[--index]));
-                
+               
                 //There is no need to find some kind of user, as a setter could return a value or not
-                // if(source[index] == "=" || source[index] == "(") 
+                // if(source[index] == "=" || source[index] == "(")
                 // {
                     const firstLineBreak = source.lastIndexOf("\n", index); //Find first back \n
 
@@ -228,7 +255,7 @@ function replaceUsages(source)
                 replacedFunc = replacedFunc.substring(0, replacedFunc.lastIndexOf(")"));
 
                 //If it does not use variables, do not create scope
-                if(funcVars.length == 0) 
+                if(funcVars.length == 0)
                     replacedFunc = replacedFunc.substring(1, replacedFunc.length-1);
                 nSource = nSource.replace(new RegExp(b+"\\(.*\\);?"), replacedFunc);
             }

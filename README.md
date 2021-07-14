@@ -60,4 +60,26 @@ console.log(i); //2
 
 REMINDER
 It will create a new scope for inserting any operation if you do any kind of variable manipulation
-Open for pull requests
+Open for pull requests.
+
+
+## CHANGE-LOG
+
+
+### v1.1.0
+
+- Now it is possible to define functions inside DEFINE. For instance:
+
+```ts
+DEFINE(_TO_STRING, (v) =>
+{
+    toString(){return nameof(v);}
+});
+
+class Test
+{
+    _TO_STRING(Test)
+}
+```
+
+With that, Test will earn the method toString(), which will return "Test".
