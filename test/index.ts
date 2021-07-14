@@ -20,6 +20,17 @@ DEFINE(Increment, (v) =>
     return v++;
 });
 
+DEFINE(_TO_STRING, (v) =>
+{
+    toString(){return nameof(v);}
+});
+
+
+class Test
+{
+    _TO_STRING(Test)
+}
+
 let i = 0;
 
 Increment(i);
