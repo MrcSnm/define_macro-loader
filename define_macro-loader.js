@@ -137,7 +137,11 @@ function getDefineFunctions(source)
 function getDefineArguments(define)
 {
     const matchArg = new RegExp(/DEFINE\(\w+,\s*(?:function)?\((.+)\)/);
-    return define.match(matchArg)[1];
+
+    const match = define.match(matchArg)[1];
+    if(match.indexOf(",") != -1)
+        return match.split(/, */g);
+    return match;
 }
 
 function isCharSpace(char){return char == "\n" || char == " " || char == "\t" || char == "\r";}
@@ -184,9 +188,6 @@ function replaceUsages(source)
             }
 
             var argNames = getDefineArguments(defines[b]);
-            for(var i = 0; i < argNames.length; i++)
-                argNames[i] = replaceAll(argNames[i], " ", "");
-
             //Cache the target function
             var replacedFunc = defines[b];
 
@@ -206,16 +207,18 @@ function replaceUsages(source)
 
             if(typeof argNames == "string")
                 argNames = [argNames];
+
+            //Destroy everything until finding the first {
+            replacedFunc = replacedFunc.substring(replacedFunc.indexOf("{"))
+
+
             //Change the arguments to the absolute value passed
-            for(var i = 0; i < argNames.length; i++)
+            for(i = 0; i < argNames.length; i++)
             {
                 replacedFunc = replacedFunc.replace(new RegExp(argNames[i]+"\\b", "g"),
                 (match) => argValues[i]);
             }
 
-            //Destroy everything until finding the first {
-            replacedFunc = replacedFunc.substring(replacedFunc.indexOf("{"))
-           
 
             //Search a return for wether the function should be treated as a rval or code block
             const retIndex = getMacroReturnIndex(replacedFunc);

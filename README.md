@@ -65,6 +65,20 @@ Open for pull requests.
 
 ## CHANGE-LOG
 
+### v1.2.0
+
+- Now the macro is accepting more than one variable. With that, we get the possibility to:
+
+```ts
+DEFINE(_SWAP, (a, b) =>
+{
+    let temp = a;
+    a = b;
+    b = temp;
+});
+```
+Yea, with the new macros, we get the possibility to make an in-place swap.
+
 
 ### v1.1.0
 

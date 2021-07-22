@@ -1,10 +1,10 @@
 {
   "name": "@hipreme_entertainment/define_macro-loader",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Provides a C-like macro for javascript and typescript",
   "main": "define_macro-loader.js",
   "scripts": {
-    "test": "cd test && webpack"
+    "test": "cd test && webpack && node dist/main.js"
   },
   "repository": {
     "type": "git",
