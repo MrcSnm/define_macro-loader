@@ -65,13 +65,11 @@ Open for pull requests.
 
 ## CHANGE-LOG
 
-#### v1.2.2
-
-- Minor bug fix when jumping lines and calling no arg macros
-
-#### v1.2.1
+#### v1.2.1 - v1.2.3
 
 - Accepts no argument macro
+- Minor bug fix when jumping lines and calling no arg macros
+- Minor bug fix when having more than one argument and jumping lines
 
 ### v1.2.0
 

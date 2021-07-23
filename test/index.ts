@@ -60,5 +60,6 @@ let world = "world";
 _SWAP(hello, world);
 
 console.log(hello, " ", world);
-console.log(_FILENAME_NO_EXT()
+console.log(_FILENAME_NO_EXT(),
+"OPA"
 );

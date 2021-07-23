@@ -233,6 +233,7 @@ function replaceUsages(source)
                 const returnIndex = getFirstReturnIndex(replacedFunc);
                 const retStatement = replacedFunc.substring(returnIndex+"return ".length, replacedFunc.lastIndexOf("})")).replace(";", "");
                 const process = replacedFunc.substring(replacedFunc.indexOf("{")+1, returnIndex);
+
                 //Get rid of the return, as "=" symbol will do the task.
                 let index = m.index-1;
                 while(isCharSpace(source[--index]));
@@ -244,7 +245,10 @@ function replaceUsages(source)
 
                     //First endline
                     let endLine = m.index;
-                    while(source[++endLine] != "\n" && source[endLine] != ";" && source[endLine] != "\r" && source[endLine] != "\0");
+
+                    const sourceNot = ["\n", ";", "\r", "\0", ","];
+
+                    while(sourceNot.indexOf(source[++endLine]) == -1);
 
                     let line = source.substring(firstLineBreak, endLine);
                     if(source[endLine] === ";")
