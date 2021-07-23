@@ -65,6 +65,9 @@ Open for pull requests.
 
 ## CHANGE-LOG
 
+#### v1.2.2
+
+- Minor bug fix when jumping lines and calling no arg macros
 
 #### v1.2.1
 

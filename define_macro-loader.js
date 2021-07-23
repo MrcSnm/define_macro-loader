@@ -96,7 +96,7 @@ function checkNotDefined(name)
 
 
 const reg = new RegExp(/DEFINE\((\w+)/g);
-const funcArgs = "\\s*\\((.+)\\)";
+const funcArgs = "\\s*\\((.*)\\)";
 
 
 
@@ -174,6 +174,8 @@ function replaceUsages(source)
         const funcReg = new RegExp(b+funcArgs, "g");
 
         //Create the DEFINE call for the line that called it
+        
+     
         for(let m of source.matchAll(funcReg))
         {
             //Clean argument values and names
@@ -194,7 +196,6 @@ function replaceUsages(source)
             var argNames = getDefineArguments(defines[b]);
             //Cache the target function
             var replacedFunc = defines[b];
-
            
             //Get the variables defined inside the function
             var variablesMatch = new RegExp("(let|var|const)\\s+(\\w+)", "g");
