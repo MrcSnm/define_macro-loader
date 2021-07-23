@@ -137,8 +137,12 @@ function getDefineFunctions(source)
 function getDefineArguments(define)
 {
     const matchArg = new RegExp(/DEFINE\(\w+,\s*(?:function)?\((.+)\)/);
+    const matches = define.match(matchArg);
+    
+    if(matches == null)
+        return [];
 
-    const match = define.match(matchArg)[1];
+    const match = matches[1];
     if(match.indexOf(",") != -1)
         return match.split(/, */g);
     return match;

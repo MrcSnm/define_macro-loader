@@ -33,6 +33,10 @@ DEFINE(_SWAP, (a, b) =>
 });
 
 
+DEFINE(_FILENAME_NO_EXT, () =>
+{
+    return __filename.substring(__filename.lastIndexOf("/")+1, __filename.lastIndexOf("."));
+});
 
 
 
@@ -55,3 +59,4 @@ let world = "world";
 _SWAP(hello, world);
 
 console.log(hello, " ", world);
+console.log(_FILENAME_NO_EXT());

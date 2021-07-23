@@ -65,6 +65,11 @@ Open for pull requests.
 
 ## CHANGE-LOG
 
+
+#### v1.2.1
+
+- Accepts no argument macro
+
 ### v1.2.0
 
 - Now the macro is accepting more than one variable. With that, we get the possibility to:
