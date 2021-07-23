@@ -5,3 +5,4 @@ declare function _TO_STRING(varName : any) : void;
 declare function _SWAP<T>(a:T, b:T) : void;
 declare function _FILENAME_NO_EXT() : string;
 declare var Increment : (v : any) => any;
+declare var preval : (str:TemplateStringsArray) => any;

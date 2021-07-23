@@ -7,15 +7,18 @@ module.exports = {
     devtool: "inline-source-map",
     module: {
       rules: [
-        { test: /\.(j|t)sx?$/, use : {loader: 'babel-loader', 
-        options: 
-        {
-            presets: 
-            [
-                "@babel/preset-env"
-            ]
-        }}},
-        { test: /\.tsx?$/, use: [{ loader: path.resolve('../define_macro-loader.js')}]},
+        { 
+          test: /\.(j|t)s$/,
+          use : 
+          [
+            {loader: 'babel-loader'},
+            {loader: path.resolve('../define_macro-loader.js')}
+          ], 
+        }
       ],
     },
+    resolve:
+    {
+      extensions: [".ts", ".js"]
+    }
   };

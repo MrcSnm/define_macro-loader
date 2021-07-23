@@ -1,6 +1,6 @@
 {
   "name": "@hipreme_entertainment/define_macro-loader",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Provides a C-like macro for javascript and typescript",
   "main": "define_macro-loader.js",
   "scripts": {
@@ -34,6 +34,7 @@
     "@babel/preset-typescript": "^7.14.5",
     "@types/ts-nameof": "^4.2.1",
     "babel-loader": "^8.2.2",
+    "babel-plugin-preval": "^5.0.0",
     "babel-plugin-ts-nameof": "^4.2.1",
     "webpack": "^5.41.1",
     "webpack-cli": "^4.7.2"

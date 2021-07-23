@@ -58,18 +58,29 @@ console.log(i); //2
 
 ```
 
-REMINDER
-It will create a new scope for inserting any operation if you do any kind of variable manipulation
-Open for pull requests.
+## REMINDER
+-   You can't use the macros defined elsewhere in your first file. If you wish to use it, you will need to
+make one level of indirection to use them, e.g: index.ts requires "macro", and then, your app.ts will be able
+to use the macros defined inside macros.ts
+-   It will create a new scope for inserting any operation if you do any kind of variable manipulation
+-   Open for pull requests.
+
+## RECOMMENDED PLUGINS FOR INTERWORK
+
+-   [Babel Preval Plugin](https://www.npmjs.com/package/babel-plugin-preval), why: You can create macros that can take an filename and pre evaluate it in compile time. The preval becomes much more useful with macros, check its use case on the macro _FILENAME_NO_EXT. If you check the output, you will see how much faster it is.
+-   [Typescript Nameof Plugin](https://www.npmjs.com/package/babel-plugin-ts-nameof), why: You can save your variable names as a string. This plugin is really empowered by the macro, as you get variables by reference and not value, so, the name is not lost.
+
+
 
 
 ## CHANGE-LOG
 
-#### v1.2.1 - v1.2.3
+#### v1.2.1 - v1.2.4
 
 - Accepts no argument macro
 - Minor bug fix when jumping lines and calling no arg macros
 - Minor bug fix when having more than one argument and jumping lines
+- Showing how the flow for complex apps work.
 
 ### v1.2.0
 
