@@ -75,12 +75,13 @@ to use the macros defined inside macros.ts
 
 ## CHANGE-LOG
 
-#### v1.2.1 - v1.2.4
+#### v1.2.1 - v1.2.5
 
 - Accepts no argument macro
 - Minor bug fix when jumping lines and calling no arg macros
 - Minor bug fix when having more than one argument and jumping lines
 - Showing how the flow for complex apps work.
+- Now it accepts strings with commas inside
 
 ### v1.2.0
 

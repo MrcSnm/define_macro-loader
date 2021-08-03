@@ -25,7 +25,72 @@ function isInsideComment(source, index)
             return true;
     }
     return false;
-   
+}
+
+/**
+ * @typedef StringDefinition
+ * @property {string} str
+ * @property {number} start
+ * @property {number} end
+ * @property {string} definer
+ */
+
+/**
+ * 
+ * @param {string} source 
+ * @param {number} index 
+ * @return {StringDefinition|null}
+ */
+function getStringDefinition(source, index)
+{
+    const strDefs = ['"', "'", "`"];
+    let foundStrDefiner = "";
+    const escapeCharacters = ["\\"];
+
+    const strRet = 
+    {
+        str : "",
+        start : 0,
+        end   : 0,
+        definer : ""
+    }
+    for(let i = index; i >= 0; i--)
+    {
+        if(foundStrDefiner === "" &&
+        strDefs.indexOf(source[i]) != -1 && 
+        (i == 0 || escapeCharacters.indexOf(source[i-1]) == -1))
+        {
+            foundStrDefiner = source[i];
+            strRet.start   = i;
+            strRet.definer = foundStrDefiner;
+        }
+        else if(foundStrDefiner !== "" &&
+        source[i] == foundStrDefiner &&
+        (i == 0 || escapeCharacters.indexOf(source[i-1]) == -1))
+        {
+            if(getStringDefinition(source, i+1) != null)
+                return null;
+            break;
+        }
+    }
+    if(foundStrDefiner === "")
+        return null;
+
+    for(let i = index; i < source.length; i++)
+    {
+        if(escapeCharacters.indexOf(source[i]) != -1)
+        {
+            i++;
+            continue;
+        }
+        else if(source[i] == foundStrDefiner)
+        {
+            strRet.end = i+1;
+            strRet.str = source.substring(strRet.start, i+1);
+            return strRet;
+        }
+    }
+    return false;
 }
 
 function replaceAll(source, replaceTarget, replaceValue)
@@ -166,6 +231,41 @@ function getFirstReturnIndex(source)
     return currentReturnIndex;
 }
 
+function getArgValues(argValuesLine)
+{
+    let strDefines = ['"', "`", "'"];
+    let args = [];
+    let currIndex = 0;
+
+    for(let i = 0; i < argValuesLine.length; i++)
+    {
+        if(strDefines.indexOf(argValuesLine[i]) != -1)
+        {
+            let strDef = getStringDefinition(argValuesLine, i - 1);
+            if(strDef == null && i != 0)
+            {
+                const tempArgs = argValuesLine.substring(currIndex+1, i-1).split(",");
+                for(let z = 0; z < tempArgs.length;z++)
+                    if(tempArgs[z] != "")
+                        args.push(tempArgs[z]);
+            }
+            else if(strDef != null)
+                args.push(strDef.str);
+            currIndex = i;
+            strDef = getStringDefinition(argValuesLine, i+1); //Should be guaranteed non null here
+            args.push(strDef.str);
+            currIndex = strDef.end+1;
+            i = currIndex;
+        }
+    }
+    let newArgValuesLine = argValuesLine.substring(currIndex, argValuesLine.length);
+    if(newArgValuesLine != "")
+        args.push(...newArgValuesLine.split(","));
+    if(args.length == 0)
+        args.push("");
+    return args;
+}
+
 function replaceUsages(source)
 {
     let nSource = source;
@@ -182,7 +282,7 @@ function replaceUsages(source)
             if(isInsideComment(source, m.index))
                 continue;
 
-            var argValues = m[1].split(",");
+            var argValues = getArgValues(m[1]);
 
            
             let shouldCloseFunction = false;

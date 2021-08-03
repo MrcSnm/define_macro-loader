@@ -29,4 +29,10 @@ DEFINE(_FILENAME_NO_EXT, () =>
     return preval`module.exports =__filename.substring(__filename.lastIndexOf("/")+1, __filename.lastIndexOf("."))`;
 });
 
+
+DEFINE(_STR_ARG_TEST, (v, v2, v3) =>
+{
+    console.log(v + v2 + v3);
+});
+
 require("./index")

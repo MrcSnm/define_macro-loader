@@ -24,7 +24,9 @@ let world = "world";
 
 _SWAP(hello, world);
 
+_STR_ARG_TEST("bad, bad", hello, "woops");
+
 console.log(hello, " ", world);
 console.log(_FILENAME_NO_EXT(),
-"OPA"
+"w"
 );
