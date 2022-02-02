@@ -93,18 +93,6 @@ function getStringDefinition(source, index)
     return false;
 }
 
-function replaceAll(source, replaceTarget, replaceValue)
-{
-    let ind = 0;
-    let nSource = source;
-    while((ind = source.indexOf(replaceTarget, ind)) !== -1)
-    {
-        nSource = nSource.replace(replaceTarget, replaceValue);
-        ind+= replaceTarget.length+1;
-    }
-    return nSource;
-}
-
 function indexOfStringClosing(input, openString, closeString, start)
 {
     let open = 0;
@@ -376,6 +364,101 @@ function replaceUsages(source)
     return nSource;
 }
 
+///Better than substring as it doesn't allocate memory
+function substringEquals(str, start, equalsTo)
+{
+    if(start + equalsTo.length > str.length)
+        return false;
+    for(let i = 0; i < equalsTo.length; i++)
+    {
+        if(equalsTo[i] != str[start+i])
+            return false;
+    }
+    return true;
+}
+
+function replaceAll(source, replaceTarget, replaceValue)
+{
+    for(let i = 0; i < source.length; i++)
+    {
+        if(substringEquals(source, i, replaceTarget))
+        {
+            source = source.substring(0, i) + replaceValue + source.substring(i+replaceTarget.length, source.length);
+            i+= replaceTarget.length;
+        }
+    }
+    return source;
+}
+
+function replaceKeywords(src, filename)
+{
+    const KEYWORDS = ["__FILE__", "__LINE__"];
+    let line = 0;
+    for(let i = 0; i < src.length; i++)
+    {
+        switch(src[i])
+        {
+            case '\n': 
+                line++;
+                break;
+            case '/':
+                if(i+1 < src.length && src[i+1] == '/')
+                {
+                    i+=2;
+                    while(i < src.length && src[i] != '\n')
+                        i++;
+                    i++;line++;
+                }
+                else if(i+1 < src.length && src[i+1] == '*')
+                {
+                    i+=2;
+                    while(i < src.length && src[i] != "*" && i+1 < src.length && src[i+1] != '/')
+                    {
+                        if(src[i] == '\n')
+                            line++;
+                        i++;
+                    }
+                    i+=2;
+                }
+                break;
+            case '"':
+            case "'":
+            case '`':
+                const c = src[i];
+                i++;
+                while(i < src.length && src[i] != c)
+                {
+                    if(src[i] == '\\')
+                        i++;
+                    i++;
+                }
+                break;
+            default:
+                for(k of KEYWORDS)
+                {
+                    if(substringEquals(src, i, k))
+                    {
+                        switch(k)
+                        {
+                            case "__LINE__":
+                                src = src.substring(0, i) + line + src.substring(i+k.length, src.length);
+                                break;
+                            case "__FILE__":
+                                src = src.substring(0, i) + '"'+filename+'"' + src.substring(i+k.length, src.length);
+                                i+= filename.length+2; //Take into account both the '"'
+                                break;
+                            default:
+                                throw new Error("Unexpected error");
+                        }
+                        break;
+                    }
+                }
+                break;
+        }
+    }
+    return src;
+}
+
 
 /**
  * Used for typescript source. It can't do intermodule decltype
@@ -386,6 +469,10 @@ module.exports = function(source)
 {
     const opts = loader_utils.getOptions(this);
     source = getDefineFunctions(source);
+    source = replaceUsages(source);
+    let filename = this.resourcePath;
 
-    return replaceUsages(source);
+    if(process.platform == "win32")
+        filename = replaceAll(filename, "\\", "\\\\");
+    return replaceKeywords(source, filename);
 }

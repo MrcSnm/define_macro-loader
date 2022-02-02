@@ -11,6 +11,11 @@ DEFINE(Increment, (v) =>
     return v++;
 });
 
+DEFINE(SMARTLOG, (v) =>
+{
+    console.log(v, " at "+__FILE__+":"+__LINE__);
+});
+
 DEFINE(_TO_STRING, (v) =>
 {
     toString(){return nameof(v);}
