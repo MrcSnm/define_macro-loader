@@ -7,6 +7,9 @@ globalRef.set(200);
 console.log(globalRef.get());
 
 SMARTLOG("I want to log but smartly");
+SMARTLOG("");
+SMARTLOG('');
+SMARTLOG(``);
 
 class Test
 {

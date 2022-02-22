@@ -54,6 +54,18 @@ function getStringDefinition(source, index)
         end   : 0,
         definer : ""
     }
+
+    //Check if the source is an empty string definition: '' or "" or ``
+    if(source == '""' || source == "''" || source == '``')
+    {
+        strRet.str = source;
+        strRet.start = index;
+        strRet.end = index+1;
+        strRet.definer = source[0];
+        return strRet;
+    }
+    
+    //Search before the index sent if a string definition exists and save what is the string definer.
     for(let i = index; i >= 0; i--)
     {
         if(foundStrDefiner === "" &&
@@ -73,9 +85,11 @@ function getStringDefinition(source, index)
             break;
         }
     }
+    //Returns null if the finding loop failed
     if(foundStrDefiner === "")
         return null;
 
+    //Now iterate until the end of source for getting the string definition
     for(let i = index; i < source.length; i++)
     {
         if(escapeCharacters.indexOf(source[i]) != -1)
@@ -90,7 +104,7 @@ function getStringDefinition(source, index)
             return strRet;
         }
     }
-    return false;
+    return null;
 }
 
 function indexOfStringClosing(input, openString, closeString, start)
