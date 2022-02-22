@@ -4,6 +4,38 @@
  */
 const loader_utils = require("loader-utils");
 
+const _a = "a".charCodeAt(0);
+const _z = "z".charCodeAt(0);
+const _A = "A".charCodeAt(0);
+const _Z = "Z".charCodeAt(0);
+const _0 = "0".charCodeAt(0);
+const _9 = "9".charCodeAt(0);
+
+function isUpperCase(character)
+{
+    const c = character.charCodeAt(0);
+    return c >= _A && c <= _Z;
+}
+function isLowerCase(character)
+{
+    const c = character.charCodeAt(0);
+    return c >= _a && c <= _z;
+}
+function isNumeric(character)
+{
+    const c = character.charCodeAt(0);
+    return c >= _0 && c <= _9;
+}
+
+function isAlpha(character)
+{
+    return isUpperCase(character) || isLowerCase(character);
+}
+function isAlphaNumeric(character)
+{
+    return isAlpha(character) || isNumeric(character);
+}
+
 
 function isInsideComment(source, index)
 {
@@ -25,86 +57,6 @@ function isInsideComment(source, index)
             return true;
     }
     return false;
-}
-
-/**
- * @typedef StringDefinition
- * @property {string} str
- * @property {number} start
- * @property {number} end
- * @property {string} definer
- */
-
-/**
- * 
- * @param {string} source 
- * @param {number} index 
- * @return {StringDefinition|null}
- */
-function getStringDefinition(source, index)
-{
-    const strDefs = ['"', "'", "`"];
-    let foundStrDefiner = "";
-    const escapeCharacters = ["\\"];
-
-    const strRet = 
-    {
-        str : "",
-        start : 0,
-        end   : 0,
-        definer : ""
-    }
-
-    //Check if the source is an empty string definition: '' or "" or ``
-    if(source == '""' || source == "''" || source == '``')
-    {
-        strRet.str = source;
-        strRet.start = index;
-        strRet.end = index+1;
-        strRet.definer = source[0];
-        return strRet;
-    }
-    
-    //Search before the index sent if a string definition exists and save what is the string definer.
-    for(let i = index; i >= 0; i--)
-    {
-        if(foundStrDefiner === "" &&
-        strDefs.indexOf(source[i]) != -1 && 
-        (i == 0 || escapeCharacters.indexOf(source[i-1]) == -1))
-        {
-            foundStrDefiner = source[i];
-            strRet.start   = i;
-            strRet.definer = foundStrDefiner;
-        }
-        else if(foundStrDefiner !== "" &&
-        source[i] == foundStrDefiner &&
-        (i == 0 || escapeCharacters.indexOf(source[i-1]) == -1))
-        {
-            if(getStringDefinition(source, i+1) != null)
-                return null;
-            break;
-        }
-    }
-    //Returns null if the finding loop failed
-    if(foundStrDefiner === "")
-        return null;
-
-    //Now iterate until the end of source for getting the string definition
-    for(let i = index; i < source.length; i++)
-    {
-        if(escapeCharacters.indexOf(source[i]) != -1)
-        {
-            i++;
-            continue;
-        }
-        else if(source[i] == foundStrDefiner)
-        {
-            strRet.end = i+1;
-            strRet.str = source.substring(strRet.start, i+1);
-            return strRet;
-        }
-    }
-    return null;
 }
 
 function indexOfStringClosing(input, openString, closeString, start)
@@ -233,40 +185,125 @@ function getFirstReturnIndex(source)
     return currentReturnIndex;
 }
 
+/**
+ * argValuesLine always ends with ')'
+ */
 function getArgValues(argValuesLine)
 {
-    let strDefines = ['"', "`", "'"];
+    const strDefiners = ['"', '`', "'"];
+    const stackOpeners = ['(', '[', '{'];
+    const stackClosers = [')', ']', '}'];
     let args = [];
-    let currIndex = 0;
 
-    for(let i = 0; i < argValuesLine.length; i++)
+    let index = 0;
+
+    let exp = "";
+
+
+    while(index < argValuesLine.length && argValuesLine[index] != ')')
     {
-        if(strDefines.indexOf(argValuesLine[i]) != -1)
+        switch(argValuesLine[index])
         {
-            let strDef = getStringDefinition(argValuesLine, i - 1);
-            if(strDef == null && i != 0)
+            //Look for strings
+            case '"':
+            case '`':
+            case "'":
             {
-                const tempArgs = argValuesLine.substring(currIndex+1, i-1).split(",");
-                for(let z = 0; z < tempArgs.length;z++)
-                    if(tempArgs[z] != "")
-                        args.push(tempArgs[z]);
+                const strDef = argValuesLine[index];
+                const start = index;
+                index++;
+                while(index < argValuesLine.length && argValuesLine[index] != strDef)
+                {
+                    if(argValuesLine[index] == '\\')
+                    {
+                        index++;
+                        if(index >= argValuesLine.length)
+                            throw new SyntaxError("Error parsing the arg values line " + argValuesLine);
+                    }
+                    index++;
+                }
+                //Use +1 for including the ' or " or `
+                exp+= argValuesLine.substring(start, index+1)
             }
-            else if(strDef != null)
-                args.push(strDef.str);
-            currIndex = i;
-            strDef = getStringDefinition(argValuesLine, i+1); //Should be guaranteed non null here
-            args.push(strDef.str);
-            currIndex = strDef.end+1;
-            i = currIndex;
+            default:
+            {
+                //If is a lowercase, uppercase or _, search until the next argument or the end
+                if(isAlpha(argValuesLine[index]) || argValuesLine[index] == '_')
+                {
+                    const start = index;
+                    index++;
+                    while(index < argValuesLine.length && isAlphaNumeric(argValuesLine[index]))
+                        index++;
+                    exp+= argValuesLine.substring(start, index);
+                }
+                //If it is a number literal
+                else if (isNumeric(argValuesLine[index]))
+                {
+                    const start = index;
+                    index++;
+                    while(index < argValuesLine.length && isAlphaNumeric(argValuesLine[index])) //Get alphanumeric for getting formatted numbers like 0x or 0b
+                        index++;
+                    exp+= argValuesLine.substring(start, index);
+                }
+                //Checks for stack openers
+                else if(stackOpeners.indexOf(argValuesLine[index]) != -1) //If it has any of the stack openers
+                {
+                    //Stack is used for correctly parsing the arguments
+                    const stack = [argValuesLine[index]];
+                    const start = index;
+                    index++;
+
+                    while(index < argValuesLine.length)
+                    {
+                        if(stack.length == 0 && (argValuesLine[index] == ')' || argValuesLine[index] == ','))
+                            break;
+                        if(stackClosers.indexOf(argValuesLine[index]) != -1)
+                        {
+                            if(stack.length > 0)
+                                stack.pop();
+                        }
+                        else if(stackOpeners.indexOf(argValuesLine[index]) != -1)
+                        {
+                            stack.push(argValuesLine[index]);
+                        }
+                        //Check for string literals
+                        else if(strDefiners.indexOf(argValuesLine[index]) != -1)
+                        {
+                            let strDef = argValuesLine[index];
+                            index++;
+                            while(index < argValuesLine.length && argValuesLine[index] != strDef)
+                            {
+                                if(argValuesLine[index] == '\\')
+                                    index++;
+                                index++;
+                            }
+                        }
+                        index++;
+                    }
+
+                    exp+= argValuesLine.substring(start, index)
+                }
+                else //This should be commas and whitespaces
+                {
+                    if(argValuesLine[index] == ',')
+                    {
+                        args.push(exp);
+                        exp = "";
+                    }
+                    index++;
+                }
+            }
+            
         }
     }
-    let newArgValuesLine = argValuesLine.substring(currIndex, argValuesLine.length);
-    if(newArgValuesLine != "")
-        args.push(...newArgValuesLine.split(","));
+    if(exp != "")
+        args.push(exp);
+
     if(args.length == 0)
         args.push("");
     return args;
 }
+
 
 function replaceUsages(source)
 {
@@ -286,14 +323,6 @@ function replaceUsages(source)
 
             var argValues = getArgValues(m[1]);
 
-           
-            let shouldCloseFunction = false;
-            if(argValues[argValues.length-1].indexOf(")") != -1 &&
-            indexOfStringClosing(argValues[argValues.length-1], "(", ")") == -1)
-            {
-                argValues[argValues.length-1] = argValues[argValues.length-1].replace(")", "");
-                shouldCloseFunction = true;
-            }
 
             var argNames = getDefineArguments(defines[b]);
             //Cache the target function
@@ -326,7 +355,6 @@ function replaceUsages(source)
                 (match) => argValues[i]);
             }
 
-
             //Search a return for wether the function should be treated as a rval or code block
             const retIndex = getMacroReturnIndex(replacedFunc);
             if(retIndex != -1)
@@ -341,22 +369,25 @@ function replaceUsages(source)
                 while(isCharSpace(source[--index]));
                
                 //There is no need to find some kind of user, as a setter could return a value or not
-                // if(source[index] == "=" || source[index] == "(")
-                // {
-                    const firstLineBreak = source.lastIndexOf("\n", index); //Find first back \n
+                const firstLineBreak = source.lastIndexOf("\n", index); //Find first back \n
 
-                    //First endline
-                    let endLine = m.index;
+                //First endline
+                let endLine = m.index;
 
-                    const sourceNot = ["\n", ";", "\r", "\0", ","];
+                const sourceNot = ["\n", ";", "\r", "\0", ","];
 
-                    while(sourceNot.indexOf(source[++endLine]) == -1);
+                while(sourceNot.indexOf(source[++endLine]) == -1);
 
-                    let line = source.substring(firstLineBreak, endLine);
-                    if(source[endLine] === ";")
-                        line+=";";
-                    nSource = nSource.replace(line, process + source.substring(firstLineBreak, m.index) + retStatement + (shouldCloseFunction ? ")" : ""));
-                // }
+                let line = source.substring(firstLineBreak, endLine);
+                if(source[endLine] === ";")
+                    line+=";";
+
+                //Find what was after the func call + args
+                let afterCall = line.substring(line.indexOf(m[1]));
+                let tempIndex = 0;
+                while(afterCall[tempIndex++] != ')');
+                afterCall = afterCall.substring(tempIndex);
+                nSource = nSource.replace(line, process + source.substring(firstLineBreak, m.index) + retStatement + afterCall);
             }
             else
             {
@@ -492,5 +523,6 @@ module.exports = function(source)
 
     if(process.platform == "win32")
         filename = replaceAll(filename, "\\", "\\\\");
+
     return replaceKeywords(source, filename);
 }

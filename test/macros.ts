@@ -11,6 +11,19 @@ DEFINE(Increment, (v) =>
     return v++;
 });
 
+DEFINE(identity, (v) =>
+{
+    return v;
+});
+
+DEFINE(lazy, (v) =>
+{
+    return function()
+    {
+        return v;
+    }
+});
+
 DEFINE(SMARTLOG, (v) =>
 {
     console.log(v, " at "+__FILE__+":"+__LINE__);

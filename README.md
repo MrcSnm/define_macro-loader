@@ -77,6 +77,7 @@ to use the macros defined inside macros.ts
 
 #### v1.2.1 - v1.2.7
 
+- Fixed arguments parsing, now accepts returning a lambda from the macro
 - Now accepts empty string like "", `` and ''
 - Ignoring .d.ts files as some bugs may occur
 - Added \__LINE__ and \__FILE__ keywords for usage in this macro without requiring other packages (which could depend on Babel)

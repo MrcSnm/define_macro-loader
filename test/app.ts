@@ -16,6 +16,8 @@ class Test
     _TO_STRING(Test)
 }
 
+console.log(lazy(5)());
+
 let i = 0;
 
 Increment(i);
