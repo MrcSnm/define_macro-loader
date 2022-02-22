@@ -11,6 +11,11 @@ const _Z = "Z".charCodeAt(0);
 const _0 = "0".charCodeAt(0);
 const _9 = "9".charCodeAt(0);
 
+function isCharStringDefiner(character)
+{
+    return character == '"' || character == '"' || character == '`';
+}
+
 function isUpperCase(character)
 {
     const c = character.charCodeAt(0);
@@ -437,7 +442,7 @@ function replaceAll(source, replaceTarget, replaceValue)
 
 function replaceKeywords(src, filename)
 {
-    const KEYWORDS = ["__FILE__", "__LINE__"];
+    const KEYWORDS = ["__FILE__", "__LINE__", "__EXPAND__"];
     let line = 0;
     for(let i = 0; i < src.length; i++)
     {
@@ -492,6 +497,39 @@ function replaceKeywords(src, filename)
                                 src = src.substring(0, i) + '"'+filename+'"' + src.substring(i+k.length, src.length);
                                 i+= filename.length+2; //Take into account both the '"'
                                 break;
+                            case "__EXPAND__":
+                            {
+                                //Find first {
+                                let u = i;
+                                while(u < src.length && src[u++] != '{');
+                                let startExpansion = u;
+                                let brackCount = 1;
+                                while(brackCount != 0)
+                                {
+                                    if(isCharStringDefiner(src[u]))
+                                    {
+                                        let def = src[u];
+                                        u++;
+                                        while(u < src.length && src[u] != def)
+                                        {
+                                            if(src[u] == '\\')
+                                                u++;
+                                            u++;
+                                        }
+                                    }
+                                    else if(src[u] == '{')
+                                        brackCount++;
+                                    else if(src[u] == '}')
+                                        brackCount--;
+                                    u++;
+                                }
+                                console.log(
+                                    "__EXPAND__(" +filename+":"+line+")->\n\t"+src.substring(startExpansion, u)
+                                );
+                                src = src.substring(0, i) + src.substring(u);
+                                i = u;
+                                break;
+                            }
                             default:
                                 throw new Error("Unexpected error");
                         }

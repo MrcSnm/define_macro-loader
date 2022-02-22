@@ -16,6 +16,12 @@ class Test
     _TO_STRING(Test)
 }
 
+__EXPAND__
+{
+    console.log(lazy("Expanded Lazy"));
+}
+
+
 console.log(lazy(5)());
 
 let i = 0;

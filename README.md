@@ -75,8 +75,15 @@ to use the macros defined inside macros.ts
 
 ## CHANGE-LOG
 
-#### v1.2.1 - v1.2.7
+#### v1.2.1 - v1.2.10
 
+- Added \__EXPAND__ keyword, it logs during the build the code wrapped between `__EXPAND__`, (code is removed, debug only feature):
+```js
+__EXPAND__
+{
+    console.log(lazy("Hello Lazy"));
+}
+```
 - Fixed arguments parsing, now accepts returning a lambda from the macro
 - Now accepts empty string like "", `` and ''
 - Ignoring .d.ts files as some bugs may occur

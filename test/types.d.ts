@@ -10,5 +10,6 @@ declare function identity<T>(v : T) : T;
 declare function SMARTLOG(v : any) : void;
 declare var __LINE__ : number;
 declare var __FILE__ : string;
+declare var __EXPAND__ : void;
 declare var Increment : (v : any) => any;
 declare var preval : (str:TemplateStringsArray) => any;
