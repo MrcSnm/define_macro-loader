@@ -18,10 +18,7 @@ DEFINE(identity, (v) =>
 
 DEFINE(lazy, (v) =>
 {
-    return function()
-    {
-        return v;
-    }
+    return (()=>v)
 });
 
 DEFINE(SMARTLOG, (v) =>
