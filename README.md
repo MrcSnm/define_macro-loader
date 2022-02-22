@@ -75,8 +75,9 @@ to use the macros defined inside macros.ts
 
 ## CHANGE-LOG
 
-#### v1.2.1 - v1.2.6
+#### v1.2.1 - v1.2.7
 
+- Ignoring .d.ts files as some bugs may occur
 - Added \__LINE__ and \__FILE__ keywords for usage in this macro without requiring other packages (which could depend on Babel)
 - Accepts no argument macro
 - Minor bug fix when jumping lines and calling no arg macros

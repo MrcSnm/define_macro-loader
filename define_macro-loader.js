@@ -468,9 +468,13 @@ function replaceKeywords(src, filename)
 module.exports = function(source)
 {
     const opts = loader_utils.getOptions(this);
+    let filename = this.resourcePath;
+    //Ignore type definition files in case they weren't excluded. Some errors may occur.
+    if(filename.endsWith(".d.ts"))
+        return source;
+
     source = getDefineFunctions(source);
     source = replaceUsages(source);
-    let filename = this.resourcePath;
 
     if(process.platform == "win32")
         filename = replaceAll(filename, "\\", "\\\\");
