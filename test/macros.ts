@@ -44,6 +44,12 @@ DEFINE(_FILENAME_NO_EXT, () =>
     return preval`module.exports =__filename.substring(__filename.lastIndexOf("/")+1, __filename.lastIndexOf("."))`;
 });
 
+DEFINE(assertion, (expr, msg) =>
+{
+    if(!(expr))
+        console.error("Assertion for "+ STRINGOF(expr) + " failed: " + msg)
+});
+
 
 DEFINE(_STR_ARG_TEST, (v, v2, v3) =>
 {

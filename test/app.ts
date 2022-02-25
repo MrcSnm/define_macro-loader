@@ -28,7 +28,7 @@ let i = 0;
 
 Increment(i);
 
-console.log(Increment(i)); //1
+console.log(Increment(i));
 
 
 let hello = "hello";
@@ -42,3 +42,8 @@ console.log(hello, " ", world);
 console.log(_FILENAME_NO_EXT(),
 "w"
 );
+
+
+console.log(STRINGOF(1 + 5 > 3 + 6));
+
+assertion(5 + 2 > 10, "")

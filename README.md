@@ -72,8 +72,31 @@ to use the macros defined inside macros.ts
 
 
 
+### Get the keyword typings:
+```ts
+//Macro Keywords
+declare function DEFINE(varName : any, f : Function) : void;
+declare const __LINE__   : number;
+declare const __FILE__   : string;
+declare const __EXPAND__ : void;
+declare function STRINGOF(expr : any) : string;
+```
+
 
 ## CHANGE-LOG
+
+### v1.3.0
+- Added STRINGOF keyword, it basically adds " between the argument passed, making it able to do some better debugging, assertion on the passed argument:
+
+```js
+DEFINE(assertion, (expr, msg) =>
+{
+    if(!(expr))
+        console.error("Assertion for "+ STRINGOF(expr) + " failed: " + msg)
+});
+```
+As a test, you can get the following call: `assertion(5 + 2 > 10, "")` will log `Assertion for 5 + 2 > 10 failed: `;
+Notice that when you need to negate the expression, the parents ARE necessary.
 
 #### v1.2.1 - v1.2.10
 

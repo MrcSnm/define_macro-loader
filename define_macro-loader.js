@@ -11,6 +11,12 @@ const _Z = "Z".charCodeAt(0);
 const _0 = "0".charCodeAt(0);
 const _9 = "9".charCodeAt(0);
 
+
+function log(...arg)
+{
+    console.log.apply(null, ["_______\n", ...arg, "_______\n"]);
+}
+
 function isCharStringDefiner(character)
 {
     return character == '"' || character == '"' || character == '`';
@@ -32,6 +38,20 @@ function isNumeric(character)
     return c >= _0 && c <= _9;
 }
 
+function isOperator(c)
+{
+    return c == '>' ||
+           c == '<' ||
+           c == '=' ||
+           c == '+' ||
+           c == '-' ||
+           c == '*' ||
+           c == '^' ||
+           c == '~' ||
+           c == '!' ||
+           c == '/';
+}
+
 function isAlpha(character)
 {
     return isUpperCase(character) || isLowerCase(character);
@@ -51,14 +71,14 @@ function isInsideComment(source, index)
     if(multilineEndIndex !== -1)
     {
         const multilineStartIndex = source.lastIndexOf("/*", multilineEndIndex);
-        if(startIndex > multilineStartIndex && startIndex < multilineEndIndex)
+        if(multilineStartIndex == -1 || startIndex > multilineStartIndex && startIndex < multilineEndIndex)
             return true;
     }
     const oneLinerStartIndex = source.lastIndexOf("//", startIndex);
     if(oneLinerStartIndex !== -1)
     {
         const oneLinerEndIndex = source.indexOf("\n", oneLinerStartIndex);
-        if(startIndex > oneLinerStartIndex && startIndex < oneLinerEndIndex)
+        if(oneLinerEndIndex == -1 || startIndex > oneLinerStartIndex && startIndex < oneLinerEndIndex)
             return true;
     }
     return false;
@@ -249,6 +269,11 @@ function getArgValues(argValuesLine)
                     while(index < argValuesLine.length && isAlphaNumeric(argValuesLine[index])) //Get alphanumeric for getting formatted numbers like 0x or 0b
                         index++;
                     exp+= argValuesLine.substring(start, index);
+                }
+                else if (isOperator(argValuesLine[index]))
+                {
+                    exp+= " "+ argValuesLine[index]+ " ";
+                    index++;
                 }
                 //Checks for stack openers
                 else if(stackOpeners.indexOf(argValuesLine[index]) != -1) //If it has any of the stack openers
@@ -442,7 +467,7 @@ function replaceAll(source, replaceTarget, replaceValue)
 
 function replaceKeywords(src, filename)
 {
-    const KEYWORDS = ["__FILE__", "__LINE__", "__EXPAND__"];
+    const KEYWORDS = ["__FILE__", "__LINE__", "__EXPAND__", "STRINGOF"];
     let line = 0;
     for(let i = 0; i < src.length; i++)
     {
@@ -482,6 +507,7 @@ function replaceKeywords(src, filename)
                         i++;
                     i++;
                 }
+                i++;
                 break;
             default:
                 for(k of KEYWORDS)
@@ -528,6 +554,19 @@ function replaceKeywords(src, filename)
                                 );
                                 src = src.substring(0, i) + src.substring(u);
                                 i = u;
+                                break;
+                            }
+                            case "STRINGOF":
+                            {
+                                //Find the matching paren close
+                                let parenIndex = src.indexOf("(", i);
+                                let closeParenIndex = indexOfStringClosing(src, '(', ')', parenIndex);
+                                src = src.substring(0, i) +
+                                    '"' + src.substring(parenIndex,  closeParenIndex + 1) +  '"' +
+                                    src.substring(closeParenIndex+1);
+
+                                i = closeParenIndex+1;
+
                                 break;
                             }
                             default:
