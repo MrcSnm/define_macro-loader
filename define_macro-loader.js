@@ -257,7 +257,7 @@ function getArgValues(argValuesLine)
                 {
                     const start = index;
                     index++;
-                    while(index < argValuesLine.length && isAlphaNumeric(argValuesLine[index]))
+                    while(index < argValuesLine.length && isAlphaNumeric(argValuesLine[index]) || argValuesLine[index] == '.')
                         index++;
                     exp+= argValuesLine.substring(start, index);
                 }
@@ -272,7 +272,11 @@ function getArgValues(argValuesLine)
                 }
                 else if (isOperator(argValuesLine[index]))
                 {
-                    exp+= " "+ argValuesLine[index]+ " ";
+                    const start = index;
+                    index++;
+                    while(isOperator(argValuesLine[index]))
+                        index++;
+                    exp+= " "+ argValuesLine.substring(start, index)+ " ";
                     index++;
                 }
                 //Checks for stack openers

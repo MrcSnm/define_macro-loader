@@ -85,6 +85,9 @@ declare function STRINGOF(expr : any) : string;
 
 ## CHANGE-LOG
 
+#### v1.3.1
+- Fixed not being able to get object properties on parameters and fixed to accept operators containing more than one character (==, +=, etc);
+
 ### v1.3.0
 - Added STRINGOF keyword, it basically adds " between the argument passed, making it able to do some better debugging, assertion on the passed argument:
 
