@@ -1,5 +1,5 @@
 //Macro Keywords
-declare var DEFINE : (varName : any, f : Function) => void;
+declare function DEFINE(varName : any, f : Function) : void;
 declare const __LINE__   : number;
 declare const __FILE__   : string;
 declare const __EXPAND__ : void;
@@ -15,6 +15,7 @@ declare function _FILENAME_NO_EXT() : string;
 declare function lazy<T>(v : T): () => T;
 declare function identity<T>(v : T) : T;
 declare function SMARTLOG(v : any) : void;
+declare function MULTI_ARG_RETURN_TEST<T>(a:T,b:T):T;
 declare var Increment : (v : any) => any;
 
 //External

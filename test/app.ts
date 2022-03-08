@@ -43,7 +43,14 @@ console.log(_FILENAME_NO_EXT(),
 "w"
 );
 
+const testObject = {
+    a : 500
+};
 
 console.log(STRINGOF(1 + 5 > 3 + 6));
+
+console.log(MULTI_ARG_RETURN_TEST(50, 100));
+
+assertion(testObject.a == 501, "");
 
 assertion(5 + 2 > 10, "")

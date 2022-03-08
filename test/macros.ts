@@ -51,6 +51,12 @@ DEFINE(assertion, (expr, msg) =>
 });
 
 
+DEFINE(MULTI_ARG_RETURN_TEST, (a, b) =>
+{
+    return a + b;
+});
+
+
 DEFINE(_STR_ARG_TEST, (v, v2, v3) =>
 {
     console.log(v + v2 + v3);

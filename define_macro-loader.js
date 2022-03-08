@@ -408,9 +408,8 @@ function replaceUsages(source)
                 //First endline
                 let endLine = m.index;
 
-                const sourceNot = ["\n", ";", "\r", "\0", ","];
-
-                while(sourceNot.indexOf(source[++endLine]) == -1);
+                while(!substringEquals(source, endLine++, m[0]));
+                endLine+= m[0].length-1;
 
                 let line = source.substring(firstLineBreak, endLine);
                 if(source[endLine] === ";")
