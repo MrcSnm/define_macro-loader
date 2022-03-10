@@ -85,7 +85,8 @@ declare function STRINGOF(expr : any) : string;
 
 ## CHANGE-LOG
 
-#### v1.3.1 - v.1.3.2
+#### v1.3.1 - v1.3.3
+- Fixed missing operators & and |. Fixed STRINGOF
 - Now able to use multiple arguments together with a `return` statement.
 - Fixed not being able to get object properties on parameters and fixed to accept operators containing more than one character (==, +=, etc);
 

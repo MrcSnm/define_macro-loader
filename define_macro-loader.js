@@ -49,6 +49,8 @@ function isOperator(c)
            c == '^' ||
            c == '~' ||
            c == '!' ||
+           c == '|' ||
+           c == '&' ||
            c == '/';
 }
 
@@ -403,7 +405,8 @@ function replaceUsages(source)
                 while(isCharSpace(source[--index]));
                
                 //There is no need to find some kind of user, as a setter could return a value or not
-                const firstLineBreak = source.lastIndexOf("\n", index); //Find first back \n
+                let firstLineBreak = source.lastIndexOf("\n", index); //Find first back \n
+                if(firstLineBreak == -1) firstLineBreak++; //Guarantees valid range
 
                 //First endline
                 let endLine = m.index;
@@ -420,22 +423,52 @@ function replaceUsages(source)
                 let tempIndex = 0;
                 while(afterCall[tempIndex++] != ')');
                 afterCall = afterCall.substring(tempIndex);
+
                 nSource = nSource.replace(line, process + source.substring(firstLineBreak, m.index) + retStatement + afterCall);
             }
             else
             {
+                
                 //Check if there is an equal symbol before GetRef
                 let index = m.index-1;
-                while(isCharSpace(source[--index]));
-                if(source[index] == "=" || source[index] == "(")
-                    throw new SyntaxError("Tried to assign a variable with a void function '"+b+"'");
                
+                //Get rid of trailing ')'
                 replacedFunc = replacedFunc.substring(0, replacedFunc.lastIndexOf(")"));
 
+
+                let afterCall = "";
+                let line = "";
+
+                //Now find what is after the function call(probably should be nothing, as it does not return a value)
+                //And find the line which will be replaced
+                {
+                    let firstLineBreak = source.lastIndexOf("\n", index); //Find first back \n
+                    if(firstLineBreak == -1) firstLineBreak++; //Guarantees valid range
+    
+                    //First endline
+                    let endLine = m.index;
+    
+    
+                    while(!substringEquals(source, endLine++, m[0]));
+                    endLine+= m[0].length-1;
+    
+                    line = source.substring(firstLineBreak, endLine);
+                    if(source[endLine] === ";")
+                        line+=";";
+                    afterCall = line.substring(line.indexOf(m[1]))
+
+                    let tempIndex = 0;
+                    while(afterCall[tempIndex++] != ')');
+                    afterCall = afterCall.substring(tempIndex);
+
+                }
+                
                 //If it does not use variables, do not create scope
                 if(funcVars.length == 0)
                     replacedFunc = replacedFunc.substring(1, replacedFunc.length-1);
-                nSource = nSource.replace(new RegExp(b+"\\(.*\\);?"), replacedFunc);
+
+                
+                nSource = nSource.replace(line, replacedFunc + afterCall);
             }
         }
     }
@@ -563,12 +596,17 @@ function replaceKeywords(src, filename)
                             {
                                 //Find the matching paren close
                                 let parenIndex = src.indexOf("(", i);
+                                if(parenIndex == -1)
+                                    throw new Error("Could not find STRINGOF (");
                                 let closeParenIndex = indexOfStringClosing(src, '(', ')', parenIndex);
+                                if(closeParenIndex == -1)
+                                    throw new Error("Could not find STRINGOF )");
+
                                 src = src.substring(0, i) +
-                                    '"' + src.substring(parenIndex,  closeParenIndex + 1) +  '"' +
+                                    '"' + src.substring(parenIndex+1,  closeParenIndex) +  '"' +
                                     src.substring(closeParenIndex+1);
 
-                                i = closeParenIndex+1;
+                                i = closeParenIndex - "STRINGOF".length;
 
                                 break;
                             }
