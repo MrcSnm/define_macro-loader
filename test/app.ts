@@ -16,10 +16,10 @@ class Test
     _TO_STRING(Test)
 }
 
-__EXPAND__
-{
-    console.log(lazy("Expanded Lazy"));
-}
+// __EXPAND__
+// {
+//     console.log(lazy("Expanded Lazy"));
+// }
 
 
 console.log(lazy(5)());
@@ -53,4 +53,14 @@ console.log(MULTI_ARG_RETURN_TEST(50, 100));
 
 assertion(testObject.a == 501, "");
 
-assertion(5 + 2 > 10, "")
+assertion(5 + 2 > 10, "OMG")
+
+const arr = [1, 2, 3, 4, 5, 6];
+
+for(let i = 0; i < arr.length; i++)
+{
+    //Adding 0 as it gives an error
+    console.log(arrIndex(arr, i+0));
+}
+
+assertion(5 + 2 > 10 && 10 - 2 <  0, "Range error");

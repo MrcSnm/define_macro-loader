@@ -62,4 +62,11 @@ DEFINE(_STR_ARG_TEST, (v, v2, v3) =>
     console.log(v + v2 + v3);
 });
 
+
+DEFINE(arrIndex, (arr, i) =>
+{
+  if((i)<0||(i)>=arr.length)throw new Error(STRINGOF(arr)+"["+(i)+"] out of bounds ("+arr.length+")  at "+__FILE__+":"+__LINE__);
+  return arr[(i)];
+});
+
 require("./index")

@@ -279,7 +279,6 @@ function getArgValues(argValuesLine)
                     while(isOperator(argValuesLine[index]))
                         index++;
                     exp+= " "+ argValuesLine.substring(start, index)+ " ";
-                    index++;
                 }
                 //Checks for stack openers
                 else if(stackOpeners.indexOf(argValuesLine[index]) != -1) //If it has any of the stack openers
