@@ -85,7 +85,8 @@ declare function STRINGOF(expr : any) : string;
 
 ## CHANGE-LOG
 
-#### v1.3.1 - v1.3.4
+#### v1.3.1 - v1.3.5
+- Fixed parsing errors for functions call containing a ")" as one of its characters
 - Fixed parsing error for operators where it would exclude the next letter.
 - Fixed missing operators & and |. Fixed STRINGOF
 - Now able to use multiple arguments together with a `return` statement.
