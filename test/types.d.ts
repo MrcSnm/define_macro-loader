@@ -15,6 +15,7 @@ declare function _FILENAME_NO_EXT() : string;
 declare function lazy<T>(v : T): () => T;
 declare function identity<T>(v : T) : T;
 declare function SMARTLOG(v : any) : void;
+declare function _TEST(v: any) : void;
 declare function MULTI_ARG_RETURN_TEST<T>(a:T,b:T):T;
 ///Bound checked array index accessor with debug information
 declare function arrIndex<T>(arr: T[], i : number) : T;
