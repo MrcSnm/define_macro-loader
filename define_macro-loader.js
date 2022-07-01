@@ -360,6 +360,7 @@ function replaceUsages(source)
 
 
             var argNames = getDefineArguments(defines[b]);
+
             //Cache the target function
             var replacedFunc = defines[b];
            
@@ -369,6 +370,7 @@ function replaceUsages(source)
             for(let varM of replacedFunc.matchAll(variablesMatch))
                 funcVars.push(varM[2]);
            
+            
             //Make the variables defined inside private(must work more on it)
             for(let z = 0; z < funcVars.length; z++)
             {
@@ -389,6 +391,7 @@ function replaceUsages(source)
                 replacedFunc = replacedFunc.replace(new RegExp(argNames[i]+"\\b", "g"),
                 (match) => argValues[i]);
             }
+
 
             //Search a return for wether the function should be treated as a rval or code block
             const retIndex = getMacroReturnIndex(replacedFunc);
@@ -447,7 +450,8 @@ function replaceUsages(source)
                     //First endline
                     let endLine = m.index;
     
-    
+
+
                     while(!substringEquals(source, endLine++, m[0]));
                     endLine+= m[0].length-1;
     
@@ -456,17 +460,18 @@ function replaceUsages(source)
                         line+=";";
                     afterCall = line.substring(line.indexOf(m[1]))
 
-                    let tempIndex = 0;
-                    while(afterCall[tempIndex++] != ')');
+                    let tempIndex = afterCall.lastIndexOf(')');
+                    if(tempIndex != -1)
+                        tempIndex++;
                     afterCall = afterCall.substring(tempIndex);
-
+                    if(afterCall == ";")
+                        afterCall = "";
                 }
                 
                 //If it does not use variables, do not create scope
                 if(funcVars.length == 0)
                     replacedFunc = replacedFunc.substring(1, replacedFunc.length-1);
 
-                
                 nSource = nSource.replace(line, replacedFunc + afterCall);
             }
         }
