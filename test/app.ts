@@ -10,6 +10,7 @@ SMARTLOG("I want to log but smartly");
 SMARTLOG("");
 SMARTLOG('');
 SMARTLOG(``);
+_TEST("function()");
 
 class Test
 {
